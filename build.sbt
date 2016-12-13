@@ -13,8 +13,8 @@ lazy val root = crossProject.in(file("."))
     resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases",
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     libraryDependencies += "com.outr" %%% "props" % "1.0.0",
-    libraryDependencies += "org.scalactic" %%% "scalactic" % "3.0.0",
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.0" % "test"
+    libraryDependencies += "org.scalactic" %%% "scalactic" % "3.0.1",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.1" % "test"
   )
   .jsSettings(
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.1"

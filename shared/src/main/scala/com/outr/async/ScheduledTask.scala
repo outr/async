@@ -2,7 +2,11 @@ package com.outr.async
 
 import com.outr.props.{Val, Var}
 
+import scala.concurrent.{Future, Promise}
+
 class ScheduledTask(val task: Task) {
+  private val promise = Promise[TaskStatus]
+  val future: Future[TaskStatus] = promise.future
   protected val _status: Var[TaskStatus] = Var(TaskStatus.New)
   val status: Val[TaskStatus] = _status.toVal()
 
@@ -27,12 +31,14 @@ class ScheduledTask(val task: Task) {
             terminate()
             _status := TaskStatus.Completed
             _status := TaskStatus.Successful
+            promise.success(status())
           }
         }
       } catch {
         case t: Throwable => {
           terminate()
           _status := TaskStatus.Failure(t)
+          promise.failure(t)
         }
       }
     }
@@ -41,6 +47,7 @@ class ScheduledTask(val task: Task) {
 
   def cancel(): Unit = if (_status().cancellable) {
     _status := TaskStatus.Cancelled
+    promise.success(status())
   }
 
   def onCompleted(f: => Unit): Unit = {

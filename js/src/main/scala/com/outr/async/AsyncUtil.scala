@@ -1,24 +1,24 @@
 package com.outr.async
 
-import org.scalajs.dom._
-
 import scala.concurrent.duration.FiniteDuration
+import scala.scalajs.js
+import scala.scalajs.js.timers.SetIntervalHandle
 
 object AsyncUtil {
   private[async] def schedule(delay: FiniteDuration,
                               task: Task): ScheduledTask = {
     val scheduledTask = new ScheduledTask(task)
-    var intervalIdOption: Option[Int] = None
+    var handleOption: Option[SetIntervalHandle] = None
     val terminate = () => {
-      intervalIdOption.foreach(id => window.clearInterval(id))
+      handleOption.foreach(js.timers.clearInterval)
     }
-    val intervalId = window.setInterval(() => {
+    val handle = js.timers.setInterval(delay) {
       scheduledTask.call(terminate)
-    }, delay.toMillis / 1000.0)
-    scheduledTask.onCancel {
-      window.clearInterval(intervalId)
     }
-    intervalIdOption = Some(intervalId)
+    scheduledTask.onCancel {
+      js.timers.clearInterval(handle)
+    }
+    handleOption = Some(handle)
     scheduledTask.scheduled()
     scheduledTask
   }
